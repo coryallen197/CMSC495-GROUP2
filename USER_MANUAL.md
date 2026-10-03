@@ -1,294 +1,368 @@
 # AI IT Help Desk Assistant
+## User Manual
 
 **CMSC 495 – Group 2**
 
-**Team Members**
-- Cory Allen
-- Kayden Ayers
-- Rich Sterchele
+## 1. Introduction
 
-## Project Overview
+The AI IT Help Desk Assistant is a desktop application designed to help users submit IT support requests and assist support personnel with reviewing and managing those requests.
 
-The AI IT Help Desk Assistant is a Java-based desktop application designed to improve the process of submitting, reviewing, and managing IT support requests.
+The application provides tools for:
 
-The application provides a centralized Help Desk system where users can create support tickets and IT personnel can review, manage, and update those tickets. Ticket information is stored in a MySQL/MariaDB database and accessed through a Java Swing graphical user interface.
+- Creating IT support tickets.
+- Viewing submitted tickets.
+- Reviewing individual ticket details.
+- Tracking ticket priority and status.
+- Updating ticket status.
+- Maintaining ticket history.
+- Using AI-assisted ticket triage to help classify and prioritize support requests.
 
-The project also integrates an AI-assisted ticket triage feature. The AI analyzes a ticket's title and description and generates recommendations for the ticket's category, priority, summary, and responsible department.
+AI-generated recommendations are intended to assist support personnel. Final ticket-management decisions remain with the user.
 
-AI-generated recommendations are intended to assist IT personnel rather than replace human decision-making. Support personnel remain responsible for reviewing tickets and determining the appropriate course of action.
+---
 
-## Core Features
+## 2. Starting the Application
 
-The AI IT Help Desk Assistant provides the following functionality:
+Before launching the application, the Help Desk database must be available.
 
-- Create and submit IT support tickets.
-- Store ticket information in a MySQL/MariaDB database.
-- View submitted tickets through a centralized Ticket Dashboard.
-- Display ticket ID, category, priority, status, and creation date.
-- Open individual tickets to review detailed information.
-- Update ticket status.
-- Record ticket status changes in ticket history.
-- Use database transactions to maintain consistency between ticket updates and history records.
-- Analyze ticket titles and descriptions using an AI service.
-- Generate AI-assisted recommendations for:
-  - Category
-  - Priority
-  - Summary
-  - Responsible department
-- Maintain human review of AI-generated recommendations.
+Launch the application by starting the **Ticket Dashboard**.
 
-## Technology Stack
+When the application opens, the Ticket Dashboard displays the support tickets currently stored in the system.
 
-- **Java** — Core application logic.
-- **Java Swing** — Desktop graphical user interface.
-- **JDBC** — Database connectivity.
-- **MySQL/MariaDB** — Ticket, user, and ticket-history storage.
-- **MySQL Connector/J** — JDBC driver used by the Java application.
-- **OpenAI API** — AI-assisted ticket analysis and triage.
-- **XAMPP** — Local MariaDB/MySQL development environment.
-- **Git** — Source code version control.
-- **GitHub** — Repository hosting and team collaboration.
-- **GitHub Actions** — Continuous integration and automated build/testing.
+The dashboard contains the following columns:
 
-## Application Components
+| Column | Description |
+|---|---|
+| Ticket ID | Unique identification number assigned to the ticket |
+| Category | Type of IT problem reported |
+| Priority | Urgency assigned to the ticket |
+| Status | Current state of the ticket |
+| Created Date | Date and time the ticket was created |
 
-The application is divided into several components that work together to provide Help Desk ticket management and AI-assisted triage.
+Tickets are displayed with the most recently created tickets first.
 
-### Create Ticket
+---
 
-The Create Ticket interface allows users to submit a new IT support request.
+## 3. Ticket Dashboard
 
-Users provide:
+The Ticket Dashboard is the primary navigation screen for the Help Desk application.
 
-- Ticket title
-- Problem description
-- Category
-- Priority
+From the dashboard, users can:
 
-Available categories include Hardware, Software, Network, Account/Login, and Other. Available priorities are Low, Medium, High, and Critical.
+- Review existing support tickets.
+- Refresh the displayed ticket information.
+- Create a new ticket.
+- Open an existing ticket.
 
-Before a ticket is submitted, the application verifies that a title and description have been entered. New tickets are assigned an initial status of **Open** and stored in the database. A corresponding ticket-history record is also created. 
+### Refreshing the Dashboard
 
-### Ticket Dashboard
-
-The Ticket Dashboard provides an overview of tickets stored in the Help Desk database.
-
-The dashboard displays:
-
-- Ticket ID
-- Category
-- Priority
-- Status
-- Created Date
-
-Tickets are displayed with the most recently created tickets first. Users can refresh the dashboard, create a new ticket, or double-click an existing ticket to open its detailed view.
-
-### Ticket Details
-
-The Ticket Details interface provides additional information about an individual support ticket.
-
-From this interface, support personnel can review ticket information, manage the ticket's status, and access the AI-assisted triage functionality.
-
-### Ticket History
-
-The system maintains a history of ticket activity to support tracking and accountability.
-
-When a ticket is created, an initial history record is generated. Status changes are also recorded so that changes to a ticket can be tracked over time.
-
-Database transactions are used when related ticket and history records are modified so that the operations can be processed together.
-
-## AI-Assisted Ticket Triage
-
-The application includes an AI-assisted triage component designed to help IT personnel evaluate incoming support requests.
-
-The ticket's title and description are submitted to the AI service for analysis. The system requests four structured recommendations:
-
-- **Category** — The type of IT issue.
-- **Priority** — Low, Medium, High, or Critical.
-- **Summary** — A concise summary of the reported problem.
-- **Department** — The recommended department responsible for handling the issue.
-
-The application processes the AI response and stores the recommendations in a `TriageResult` object for presentation to the user. 
-
-AI recommendations are advisory. Support personnel remain responsible for reviewing the recommendation and making ticket-management decisions.
-
-### AI Triage Workflow
-
-Ticket Title + Description
-          |
-          v
- TicketTriageService
-          |
-          v
-    OpenAIService
-          |
-          v
-     OpenAI API
-          |
-          v
-     TriageResult
-          |
-          +-- Category
-          +-- Priority
-          +-- Summary
-          +-- Department
-
-## System Workflow
-
-The primary application workflow connects the user interface, database, ticket-management components, and AI-assisted triage service.
-
-
-Create Ticket
-      |
-      v
-Store Ticket in Database
-      |
-      +----> Create Ticket History Record
-      |
-      v
-Ticket Dashboard
-      |
-      v
-Ticket Details
-      |
-      +----> Update Ticket Status
-      |              |
-      |              v
-      |        Record Status Change
-      |        in Ticket History
-      |
-      +----> Run AI-Assisted Triage
-                     |
-                     v
-              OpenAI API
-                     |
-                     v
-              Triage Recommendation
-
-## Development Process
-
-The project was developed incrementally through the following major steps:
-
-1. Defined the HelpDesk system requirements and core features.
-2. Created the Java project and application structure.
-3. Designed and configured the MySQL database.
-4. Implemented JDBC database connectivity.
-5. Developed the Create Ticket interface.
-6. Connected ticket creation to the MySQL database.
-7. Developed the Ticket Dashboard.
-8. Added the Ticket Details interface.
-9. Implemented ticket status management.
-10. Added ticket status history tracking.
-11. Implemented database transaction handling for status changes.
-12. Developed the AI ticket triage service.
-13. Integrated AI triage into the Ticket Details interface.
-14. Tested and debugged communication between the GUI, database, and AI components.
-15. Used Git and GitHub for source control and team collaboration.
-16. Prepared the project for automated build and testing through GitHub Actions.
-17. Performed integration testing in preparation for the Alpha release.
-
-## Alpha Release
-
-The Alpha release demonstrates integration of the major components of the AI IT Help Desk Assistant.
-
-### Implemented Functionality
-
-The Alpha release includes:
-
-- Java Swing graphical user interface
-- Ticket creation and validation
-- MySQL/MariaDB database integration
-- Ticket Dashboard
-- Individual ticket details
-- Ticket status management
-- Ticket-history tracking
-- Database transaction handling
-- AI-assisted ticket triage
-- Integration between the GUI, database, and AI components
-- Git/GitHub version control
-- GitHub Actions continuous integration
-
-### End-to-End Testing
-
-The primary application workflow can be tested by:
-
-1. Starting the database server.
-2. Launching the Ticket Dashboard.
-3. Creating a new support ticket.
-4. Verifying that the ticket appears on the Ticket Dashboard.
-5. Opening the ticket to review its details.
-6. Running AI-assisted ticket triage.
-7. Reviewing the recommended category, priority, summary, and department.
-8. Changing the ticket status.
-9. Verifying that the updated status is displayed.
-10. Verifying that the status change is recorded in ticket history.
-
-AI-assisted testing requires a valid `OPENAI_API_KEY` with access to the configured API service.
-
-## Prerequisites
-
-The development version of the application requires:
-
-- Java Development Kit (JDK)
-- MySQL or MariaDB database server
-- MySQL Connector/J
-- The included `helpdesk.sql` database script
-- An OpenAI API key for AI-assisted triage
-- An IDE capable of building and running the Java project, such as IntelliJ IDEA
-
-Detailed environment configuration and database setup instructions are provided in the Installation Guide.
-
-## Documentation
-
-Additional project documentation is maintained in the `docs` directory:
-
-- `INSTALLATION_GUIDE.md` — Environment, database, JDBC driver, and API configuration instructions.
-- `API_DOCUMENTATION.md` — Documentation for the application's AI integration and supporting Java components.
-- `USER_MANUAL.md` — Instructions for operating the Help Desk application.
-
-## CI/CD
-
-The project uses GitHub Actions to support continuous integration.
-
-The CI workflow is designed to validate project changes after they are pushed to the repository. The process includes checking out the source code, configuring the Java environment, building the application, running available tests, and reporting the result.
+Select:
 
 ```text
-Code Change
-     |
-     v
-Git Commit
-     |
-     v
-Git Push
-     |
-     v
-GitHub Actions
-     |
-     v
-Build and Test
-     |
-     v
-PASS / FAIL
+Refresh
 ```
 
-Continuous integration helps identify integration or build problems before changes are incorporated into later releases.
+to reload ticket information from the database.
 
-## Security and Configuration
+Refreshing the dashboard is useful after creating or modifying a ticket so that the latest information is displayed.
 
-API credentials must not be stored directly in the source code or committed to the GitHub repository.
+### Opening a Ticket
 
-The AI integration retrieves the OpenAI API key from the following environment variable:
+To view an existing ticket:
+
+1. Locate the desired ticket in the dashboard.
+2. Double-click the ticket row.
+3. The Ticket Details window will open for the selected ticket.
+
+### Creating a New Ticket
+
+Select:
 
 ```text
-OPENAI_API_KEY
+Create New Ticket
 ```
 
-Each development environment must configure this variable separately before using AI-assisted ticket triage.
+to open the Create Ticket interface.
 
-Database connection settings are configured through the application's database connection component. Developers should verify that these settings match their local database environment before launching the application.
+## 4. Creating a Support Ticket
 
-## Project Status
+The Create Ticket window allows a user to enter information about a new IT support request.
 
-The project has reached the Alpha integration stage. Core Help Desk functionality has been implemented, including ticket creation, database persistence, dashboard viewing, ticket details, status management, ticket-history tracking, and AI-assisted ticket triage.
+### 4.1 Ticket Information
 
-Current development efforts focus on integration testing, validation of the AI service configuration, CI/CD verification, defect resolution, and preparation of project documentation.
+Enter the following information:
+
+**Ticket Title**
+
+Enter a short title that identifies the problem.
+
+Example:
+
+```text
+Unable to Connect to Wi-Fi
+```
+
+**Description**
+
+Enter a description of the technical problem. Include enough information for support personnel to understand the issue.
+
+Example:
+
+```text
+My laptop cannot connect to the company Wi-Fi network.
+Other devices appear to be working normally.
+```
+
+**Category**
+
+Select the category that best represents the problem:
+
+- Hardware
+- Software
+- Network
+- Account
+- Login
+- Other
+
+**Priority**
+
+Select the appropriate priority:
+
+- Low
+- Medium
+- High
+- Critical
+
+### 4.2 Submitting the Ticket
+
+After entering the ticket information, select the button used to submit the ticket.
+
+The application verifies that the required information has been entered.
+
+The **Ticket Title** and **Description** fields cannot be left blank.
+
+When the ticket is successfully created:
+
+- The ticket is stored in the Help Desk database.
+- The initial ticket status is set to `Open`.
+- A ticket creation entry is added to the ticket history.
+- A confirmation message is displayed.
+
+After creating the ticket, return to or refresh the Ticket Dashboard to view the newly created ticket.
+
+---
+
+## 5. Viewing and Managing Ticket Details
+
+Existing tickets can be opened from the Ticket Dashboard by double-clicking the desired ticket.
+
+The Ticket Details window provides additional information and management options for the selected support request.
+
+### 5.1 Reviewing Ticket Information
+
+Use the Ticket Details window to review the information associated with the selected ticket.
+
+Depending on the ticket, this information may include:
+
+- Ticket identification information
+- Description of the reported issue
+- Category
+- Priority
+- Current status
+- Creation information
+- Ticket history
+
+Review the ticket information before making changes to its status or acting on an AI-assisted recommendation.
+
+### 5.2 Updating Ticket Status
+
+The Ticket Details interface allows the current ticket status to be changed as the support request progresses.
+
+When changing a ticket's status:
+
+1. Open the ticket from the Ticket Dashboard.
+2. Select the appropriate new status.
+3. Save or apply the change using the available status control.
+4. Verify that the updated status is displayed.
+
+Status changes are recorded so that the progression of the support request can be reviewed later.
+
+### 5.3 Ticket History
+
+Ticket history provides a record of activity associated with the support request.
+
+A history record is created when a new ticket is submitted. Additional history information is recorded when supported ticket changes occur.
+
+This provides support personnel with a record of how the ticket has progressed after its initial creation.
+
+## 6. AI-Assisted Ticket Triage
+
+The AI-assisted triage feature helps support personnel evaluate a submitted IT support ticket.
+
+The feature analyzes the ticket title and description and provides a structured recommendation.
+
+### 6.1 Triage Recommendations
+
+The AI-assisted triage process can provide the following information:
+
+- **Category** – Recommended classification of the reported problem.
+- **Priority** – Recommended urgency of the ticket.
+- **Summary** – A concise summary of the reported issue.
+- **Department** – Recommended department or support group for handling the issue.
+
+An example recommendation may appear as:
+
+```text
+Category: Network
+Priority: High
+Summary: User cannot connect a laptop to the company wireless network.
+Department: Network Support
+```
+
+### 6.2 Using AI Triage
+
+To use AI-assisted triage:
+
+1. Open the desired ticket from the Ticket Dashboard.
+2. Review the ticket title and description.
+3. Select the available AI triage option.
+4. Allow the application to analyze the ticket.
+5. Review the returned category, priority, summary, and department recommendations.
+
+The AI feature requires access to the configured external AI service. If the service is unavailable or not configured, other Help Desk functions can still be used independently.
+
+### 6.3 Reviewing AI Recommendations
+
+AI-generated results are recommendations and should be reviewed before they are used to make ticket-management decisions.
+
+Support personnel should consider the original ticket information along with the AI recommendation.
+
+If an AI recommendation appears incorrect or inappropriate, the support user should rely on the ticket information and their own judgment rather than treating the recommendation as authoritative.
+
+---
+
+## 7. Typical User Workflow
+
+A typical Help Desk workflow is:
+
+```text
+Launch Application
+        |
+        v
+View Ticket Dashboard
+        |
+        +---------------------+
+        |                     |
+        v                     v
+Create New Ticket       Open Existing Ticket
+        |                     |
+        v                     v
+Submit Ticket           Review Ticket Details
+        |                     |
+        v                     +----> Review AI Triage
+Refresh Dashboard             |
+                              +----> Update Ticket Status
+                              |
+                              +----> Review Ticket History
+```
+
+For a new support request:
+
+1. Open the Create Ticket window.
+2. Enter the ticket title and description.
+3. Select a category and priority.
+4. Submit the ticket.
+5. Refresh the Ticket Dashboard if necessary.
+6. Open the ticket to review its details.
+7. Use AI-assisted triage when appropriate.
+8. Review the AI recommendation.
+9. Update the ticket as the support request progresses.
+
+## 8. Troubleshooting
+
+### Application Cannot Connect to the Database
+
+If the application reports a database connection error:
+
+1. Verify that the MySQL/MariaDB database server is running.
+2. Confirm that the `helpdesk_db` database is available.
+3. Contact the application administrator or development team if the problem continues.
+
+Database installation and configuration procedures are provided in `INSTALLATION_GUIDE.md`.
+
+### Tickets Do Not Appear on the Dashboard
+
+If a recently created or modified ticket is not displayed:
+
+1. Select **Refresh** on the Ticket Dashboard.
+2. Verify that the ticket was successfully submitted.
+3. If the problem continues, verify that the application is connected to the database.
+
+### AI Triage Is Unavailable
+
+AI-assisted triage requires access to the configured external AI service.
+
+If AI triage does not return a recommendation:
+
+1. Verify that an Internet connection is available.
+2. Try the operation again.
+3. If the problem continues, contact the application administrator or development team.
+
+The Help Desk's non-AI ticket functions can still be used independently when the AI service is unavailable.
+
+### Ticket Cannot Be Submitted
+
+If a ticket cannot be submitted, verify that both the **Ticket Title** and **Description** fields contain information.
+
+These fields are required before a new support ticket can be created.
+
+---
+
+## 9. User Best Practices
+
+When creating and managing support tickets:
+
+- Use a short, descriptive ticket title.
+- Provide enough detail in the description to explain the problem.
+- Select the category that most closely represents the issue.
+- Select a priority that reflects the actual urgency of the problem.
+- Review existing ticket information before making changes.
+- Refresh the dashboard after changes when necessary.
+- Review AI-generated recommendations before acting on them.
+- Do not treat AI recommendations as replacements for human judgment.
+
+Clear and complete ticket information helps both support personnel and the AI-assisted triage feature evaluate the reported problem more effectively.
+
+---
+
+## 10. Quick Reference
+
+| Task | Action |
+|---|---|
+| View tickets | Open the Ticket Dashboard |
+| Refresh tickets | Select **Refresh** |
+| Create a ticket | Select **Create New Ticket** |
+| Open a ticket | Double-click its dashboard row |
+| Review details | Open the selected ticket |
+| Update status | Use the status controls in Ticket Details |
+| Review history | View the history associated with the ticket |
+| Request AI assistance | Use the AI triage option for the selected ticket |
+| Review AI results | Review category, priority, summary, and department recommendations |
+
+---
+
+## 11. Additional Documentation
+
+For information intended for developers or administrators, refer to:
+
+- `README.md` – Project overview, architecture, features, and development information.
+- `INSTALLATION_GUIDE.md` – Development environment, database, JDBC, and AI configuration instructions.
+- `API_DOCUMENTATION.md` – Internal Java interfaces and external AI API integration.
+
+---
+
+## 12. Conclusion
+
+The AI IT Help Desk Assistant provides a centralized interface for creating, reviewing, and managing IT support tickets while incorporating AI-assisted ticket triage.
+
+The application is designed so that AI recommendations support the ticket-management process while human users retain responsibility for reviewing information and making final support decisions.

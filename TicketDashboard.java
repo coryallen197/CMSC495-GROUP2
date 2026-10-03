@@ -31,7 +31,7 @@ public class TicketDashboard extends JFrame {
         // Column names
         String[] columnNames = {
                 "Ticket ID",
-                "Title",
+                //"Title",
                 "Category",
                 "Priority",
                 "Status",

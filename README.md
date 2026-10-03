@@ -1,121 +1,149 @@
-# CMSC495-GROUP2
-
-Cory Allen
-Kayden Ayers
-Rich Sterchele
-
 # AI IT Help Desk Assistant
+
+**CMSC 495 – Group 2**
+
+**Team Members**
+- Cory Allen
+- Kayden Ayers
+- Rich Sterchele
 
 ## Project Overview
 
-The AI IT Help Desk Assistant is designed to improve the process of submitting, reviewing, and managing IT support requests. The system uses an AI-powered assistant to help users describe technical issues, identify relevant information, and create more complete and structured support tickets.
+The AI IT Help Desk Assistant is a Java-based desktop application designed to improve the process of submitting, reviewing, and managing IT support requests.
 
-The goal of the project is to reduce the amount of time IT support personnel spend interpreting incomplete or unclear ticket descriptions. By assisting with the initial ticketing process, the system can help IT staff better understand reported problems, prioritize requests, and provide more efficient support.
+The application provides a centralized Help Desk system where users can create support tickets and IT personnel can review, manage, and update those tickets. Ticket information is stored in a MySQL/MariaDB database and accessed through a Java Swing graphical user interface.
 
-AI-generated recommendations are intended to assist IT personnel rather than replace human decision-making. Support staff remain responsible for reviewing tickets and determining the appropriate course of action.
+The project also integrates an AI-assisted ticket triage feature. The AI analyzes a ticket's title and description and generates recommendations for the ticket's category, priority, summary, and responsible department.
+
+AI-generated recommendations are intended to assist IT personnel rather than replace human decision-making. Support personnel remain responsible for reviewing tickets and determining the appropriate course of action.
 
 ## Core Features
 
-The AI IT Help Desk Assistant includes the following core functionality:
+The AI IT Help Desk Assistant provides the following functionality:
 
-* Create and submit IT support tickets.
-* Store and retrieve ticket information using a MySQL database.
-* View submitted tickets through a ticket dashboard.
-* Open individual tickets to review detailed information.
-* Assign ticket categories and priorities.
-* Update ticket status as Open, In Progress, or Closed.
-* Record ticket status changes for tracking and accountability.
-* Use AI to analyze ticket titles and descriptions.
-* Generate AI-assisted recommendations for ticket category, priority, summary, and responsible department.
+- Create and submit IT support tickets.
+- Store ticket information in a MySQL/MariaDB database.
+- View submitted tickets through a centralized Ticket Dashboard.
+- Display ticket ID, category, priority, status, and creation date.
+- Open individual tickets to review detailed information.
+- Update ticket status.
+- Record ticket status changes in ticket history.
+- Use database transactions to maintain consistency between ticket updates and history records.
+- Analyze ticket titles and descriptions using an AI service.
+- Generate AI-assisted recommendations for:
+  - Category
+  - Priority
+  - Summary
+  - Responsible department
+- Maintain human review of AI-generated recommendations.
 
 ## Technology Stack
 
-The project uses the following technologies:
-
-* **Java** — Core application development.
-* **Java Swing** — Graphical user interface.
-* **JDBC** — Communication between the Java application and database.
-* **MySQL** — Storage of tickets and ticket history.
-* **AI API Integration** — AI-powered ticket analysis and triage.
-* **Git** — Source code version control.
-* **GitHub** — Repository hosting and team collaboration.
-* **GitHub Actions** — Continuous integration and automated build/testing.
+- **Java** — Core application logic.
+- **Java Swing** — Desktop graphical user interface.
+- **JDBC** — Database connectivity.
+- **MySQL/MariaDB** — Ticket, user, and ticket-history storage.
+- **MySQL Connector/J** — JDBC driver used by the Java application.
+- **OpenAI API** — AI-assisted ticket analysis and triage.
+- **XAMPP** — Local MariaDB/MySQL development environment.
+- **Git** — Source code version control.
+- **GitHub** — Repository hosting and team collaboration.
+- **GitHub Actions** — Continuous integration and automated build/testing.
 
 ## Application Components
 
-The application is divided into several components that work together to provide the HelpDesk functionality.
+The application is divided into several components that work together to provide Help Desk ticket management and AI-assisted triage.
 
 ### Create Ticket
 
-The Create Ticket interface allows users to enter information about an IT problem and submit it to the HelpDesk system. Ticket information is stored in the MySQL database for later review by support personnel.
+The Create Ticket interface allows users to submit a new IT support request.
+
+Users provide:
+
+- Ticket title
+- Problem description
+- Category
+- Priority
+
+Available categories include Hardware, Software, Network, Account/Login, and Other. Available priorities are Low, Medium, High, and Critical.
+
+Before a ticket is submitted, the application verifies that a title and description have been entered. New tickets are assigned an initial status of **Open** and stored in the database. A corresponding ticket-history record is also created. 
 
 ### Ticket Dashboard
 
-The Ticket Dashboard provides support personnel with an overview of submitted tickets. It displays important information including:
+The Ticket Dashboard provides an overview of tickets stored in the Help Desk database.
 
-* Ticket ID
-* Title
-* Category
-* Priority
-* Status
-* Creation date
+The dashboard displays:
 
-Users can refresh the dashboard, create additional tickets, and open an existing ticket to view its details.
+- Ticket ID
+- Category
+- Priority
+- Status
+- Created Date
+
+Tickets are displayed with the most recently created tickets first. Users can refresh the dashboard, create a new ticket, or double-click an existing ticket to open its detailed view.
 
 ### Ticket Details
 
-The Ticket Details interface displays additional information about a selected ticket, including its title, description, category, priority, and current status.
+The Ticket Details interface provides additional information about an individual support ticket.
 
-Support personnel can also update the ticket status from this screen.
+From this interface, support personnel can review ticket information, manage the ticket's status, and access the AI-assisted triage functionality.
 
 ### Ticket History
 
-When the status of a ticket changes, the application records the change in the ticket history. This allows the system to maintain a record of previous and new ticket statuses.
+The system maintains a history of ticket activity to support tracking and accountability.
 
-Database transactions are used to help ensure that the ticket status update and corresponding history entry are processed together.
+When a ticket is created, an initial history record is generated. Status changes are also recorded so that changes to a ticket can be tracked over time.
 
-## AI Ticket Triage
+Database transactions are used when related ticket and history records are modified so that the operations can be processed together.
 
-One of the primary features of the project is AI-assisted ticket triage.
+## AI-Assisted Ticket Triage
 
-The AI analyzes the ticket's **title and description** and generates a structured recommendation containing:
+The application includes an AI-assisted triage component designed to help IT personnel evaluate incoming support requests.
 
-* **Category** — The type of technical issue.
-* **Priority** — The recommended urgency of the ticket.
-* **Summary** — A concise summary of the reported problem.
-* **Department** — The recommended IT support group.
+The ticket's title and description are submitted to the AI service for analysis. The system requests four structured recommendations:
 
-The general AI workflow is:
+- **Category** — The type of IT issue.
+- **Priority** — Low, Medium, High, or Critical.
+- **Summary** — A concise summary of the reported problem.
+- **Department** — The recommended department responsible for handling the issue.
 
-```text
+The application processes the AI response and stores the recommendations in a `TriageResult` object for presentation to the user. 
+
+AI recommendations are advisory. Support personnel remain responsible for reviewing the recommendation and making ticket-management decisions.
+
+### AI Triage Workflow
+
 Ticket Title + Description
           |
           v
- Ticket Triage Service
+ TicketTriageService
           |
           v
-      AI Service
+    OpenAIService
           |
           v
-    Triage Result
+     OpenAI API
+          |
+          v
+     TriageResult
           |
           +-- Category
           +-- Priority
           +-- Summary
           +-- Department
-```
-
-The recommendation is presented to support personnel for review. The AI provides assistance with classification and prioritization, while the final decisions remain with the support staff.
 
 ## System Workflow
 
-The primary application workflow is:
+The primary application workflow connects the user interface, database, ticket-management components, and AI-assisted triage service.
 
-```text
+
 Create Ticket
       |
       v
-Store in MySQL
+Store Ticket in Database
+      |
+      +----> Create Ticket History Record
       |
       v
 Ticket Dashboard
@@ -123,18 +151,19 @@ Ticket Dashboard
       v
 Ticket Details
       |
-      +------> Update Status
+      +----> Update Ticket Status
       |              |
       |              v
-      |        Ticket History
+      |        Record Status Change
+      |        in Ticket History
       |
-      +------> AI Ticket Triage
+      +----> Run AI-Assisted Triage
                      |
                      v
-              AI Recommendation
-```
-
-This demonstrates the integration of the user interface, database, ticket management, and AI components within a single application.
+              OpenAI API
+                     |
+                     v
+              Triage Recommendation
 
 ## Development Process
 
@@ -160,48 +189,68 @@ The project was developed incrementally through the following major steps:
 
 ## Alpha Release
 
-The Alpha release is intended to demonstrate a working integration of the project's major components.
+The Alpha release demonstrates integration of the major components of the AI IT Help Desk Assistant.
 
-### Implemented Alpha Functionality
+### Implemented Functionality
 
-* Java Swing graphical user interface
-* Ticket creation
-* MySQL database integration
-* Ticket dashboard
-* Individual ticket details
-* Ticket status management
-* Ticket history tracking
-* AI-powered ticket triage
-* Integration between the GUI, database, and AI components
-* Git/GitHub version control
+The Alpha release includes:
 
-### Alpha Release Testing
+- Java Swing graphical user interface
+- Ticket creation and validation
+- MySQL/MariaDB database integration
+- Ticket Dashboard
+- Individual ticket details
+- Ticket status management
+- Ticket-history tracking
+- Database transaction handling
+- AI-assisted ticket triage
+- Integration between the GUI, database, and AI components
+- Git/GitHub version control
+- GitHub Actions continuous integration
 
-The application can be tested using the following end-to-end workflow:
+### End-to-End Testing
 
-1. Launch the HelpDesk application.
-2. Create a new support ticket.
-3. Verify that the ticket is stored in MySQL.
-4. Verify that the ticket appears on the Ticket Dashboard.
-5. Open the ticket and review its details.
-6. Run AI ticket triage.
-7. Review the AI-generated category, priority, summary, and department.
-8. Change the ticket status.
-9. Verify that the status change is stored in the ticket history.
-10. Commit and push the completed changes to GitHub.
-11. Verify the automated CI/CD workflow.
+The primary application workflow can be tested by:
+
+1. Starting the database server.
+2. Launching the Ticket Dashboard.
+3. Creating a new support ticket.
+4. Verifying that the ticket appears on the Ticket Dashboard.
+5. Opening the ticket to review its details.
+6. Running AI-assisted ticket triage.
+7. Reviewing the recommended category, priority, summary, and department.
+8. Changing the ticket status.
+9. Verifying that the updated status is displayed.
+10. Verifying that the status change is recorded in ticket history.
+
+AI-assisted testing requires a valid `OPENAI_API_KEY` with access to the configured API service.
+
+## Prerequisites
+
+The development version of the application requires:
+
+- Java Development Kit (JDK)
+- MySQL or MariaDB database server
+- MySQL Connector/J
+- The included `helpdesk.sql` database script
+- An OpenAI API key for AI-assisted triage
+- An IDE capable of building and running the Java project, such as IntelliJ IDEA
+
+Detailed environment configuration and database setup instructions are provided in the Installation Guide.
+
+## Documentation
+
+Additional project documentation is maintained in the `docs` directory:
+
+- `INSTALLATION_GUIDE.md` — Environment, database, JDBC driver, and API configuration instructions.
+- `API_DOCUMENTATION.md` — Documentation for the application's AI integration and supporting Java components.
+- `USER_MANUAL.md` — Instructions for operating the Help Desk application.
 
 ## CI/CD
 
-The project uses GitHub Actions for continuous integration.
+The project uses GitHub Actions to support continuous integration.
 
-The CI/CD pipeline is intended to automatically validate project changes after they are pushed to GitHub. The workflow includes:
-
-1. Checking out the latest source code.
-2. Configuring the Java environment.
-3. Building the application.
-4. Running available automated tests.
-5. Reporting whether the build and tests pass or fail.
+The CI workflow is designed to validate project changes after they are pushed to the repository. The process includes checking out the source code, configuring the Java environment, building the application, running available tests, and reporting the result.
 
 ```text
 Code Change
@@ -222,8 +271,24 @@ Build and Test
 PASS / FAIL
 ```
 
+Continuous integration helps identify integration or build problems before changes are incorporated into later releases.
+
+## Security and Configuration
+
+API credentials must not be stored directly in the source code or committed to the GitHub repository.
+
+The AI integration retrieves the OpenAI API key from the following environment variable:
+
+```text
+OPENAI_API_KEY
+```
+
+Each development environment must configure this variable separately before using AI-assisted ticket triage.
+
+Database connection settings are configured through the application's database connection component. Developers should verify that these settings match their local database environment before launching the application.
+
 ## Project Status
 
-The project is currently being prepared for the Alpha release. Core HelpDesk functionality, database integration, ticket management, and AI-assisted ticket triage have been implemented.
+The project has reached the Alpha integration stage. Core Help Desk functionality has been implemented, including ticket creation, database persistence, dashboard viewing, ticket details, status management, ticket-history tracking, and AI-assisted ticket triage.
 
-Remaining Alpha-release work includes final integration testing, validation of the CI/CD pipeline, resolution of any identified defects, and preparation of the Alpha release.
+Current development efforts focus on integration testing, validation of the AI service configuration, CI/CD verification, defect resolution, and preparation of project documentation.

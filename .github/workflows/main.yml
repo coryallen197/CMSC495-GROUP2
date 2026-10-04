@@ -24,6 +24,11 @@ jobs:
         run: |
           wget -q https://repo1.maven.org/maven2/com/mysql/mysql-connector-j/9.5.0/mysql-connector-j-9.5.0.jar
 
+      - name: Download JaCoCo
+        run: |
+          wget -q https://repo1.maven.org/maven2/org/jacoco/org.jacoco.agent/0.8.15/org.jacoco.agent-0.8.15-runtime.jar
+          wget -q https://repo1.maven.org/maven2/org/jacoco/org.jacoco.cli/0.8.15/org.jacoco.cli-0.8.15-nodeps.jar
+
       - name: Compile Java source
         run: |
           mkdir -p build
@@ -32,9 +37,28 @@ jobs:
             -d build \
             *.java
 
-      - name: Run automated tests
+      - name: Run automated tests with coverage
         run: |
-          java -cp "build:mysql-connector-j-9.5.0.jar" Week8.TriageResultTest
+          java \
+            -javaagent:org.jacoco.agent-0.8.15-runtime.jar=destfile=jacoco.exec \
+            -cp "build:mysql-connector-j-9.5.0.jar" \
+            Week8.TriageResultTest
+
+      - name: Generate JaCoCo coverage report
+        run: |
+          mkdir -p coverage
+          java -jar org.jacoco.cli-0.8.15-nodeps.jar report jacoco.exec \
+            --classfiles build \
+            --sourcefiles . \
+            --html coverage \
+            --xml coverage/jacoco.xml \
+            --csv coverage/jacoco.csv
+
+      - name: Upload JaCoCo coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-coverage-report
+          path: coverage/
 
       - name: Verify compiled classes
         run: |

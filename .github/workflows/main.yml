@@ -12,10 +12,10 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: "temurin"
           java-version: "21"
@@ -23,6 +23,11 @@ jobs:
       - name: Download MySQL Connector/J
         run: |
           wget -q https://repo1.maven.org/maven2/com/mysql/mysql-connector-j/9.5.0/mysql-connector-j-9.5.0.jar
+
+      - name: Download JaCoCo
+        run: |
+          wget -q https://repo1.maven.org/maven2/org/jacoco/org.jacoco.agent/0.8.15/org.jacoco.agent-0.8.15-runtime.jar
+          wget -q https://repo1.maven.org/maven2/org/jacoco/org.jacoco.cli/0.8.15/org.jacoco.cli-0.8.15-nodeps.jar
 
       - name: Compile Java source
         run: |
@@ -32,7 +37,35 @@ jobs:
             -d build \
             *.java
 
+      - name: Run automated tests with coverage
+        run: |
+          java \
+            -javaagent:org.jacoco.agent-0.8.15-runtime.jar=destfile=jacoco.exec \
+            -cp "build:mysql-connector-j-9.5.0.jar" \
+            Week8.TriageResultTest
+
+          java \
+            -javaagent:org.jacoco.agent-0.8.15-runtime.jar=destfile=jacoco.exec,append=true \
+            -cp "build:mysql-connector-j-9.5.0.jar" \
+            Week8.TicketTriageServiceTest
+
+      - name: Generate JaCoCo coverage report
+        run: |
+          mkdir -p coverage
+          java -jar org.jacoco.cli-0.8.15-nodeps.jar report jacoco.exec \
+            --classfiles build \
+            --sourcefiles . \
+            --html coverage \
+            --xml coverage/jacoco.xml \
+            --csv coverage/jacoco.csv
+
+      - name: Upload JaCoCo coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-coverage-report
+          path: coverage/
+
       - name: Verify compiled classes
         run: |
-          echo "Java compilation completed successfully."
+          echo "Java compilation and automated testing completed successfully."
           find build -name "*.class" -print

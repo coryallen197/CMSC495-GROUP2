@@ -1,0 +1,38 @@
+name: Java CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "21"
+
+      - name: Download MySQL Connector/J
+        run: |
+          wget -q https://repo1.maven.org/maven2/com/mysql/mysql-connector-j/9.5.0/mysql-connector-j-9.5.0.jar
+
+      - name: Compile Java source
+        run: |
+          mkdir -p build
+          javac \
+            -cp "mysql-connector-j-9.5.0.jar" \
+            -d build \
+            *.java
+
+      - name: Verify compiled classes
+        run: |
+          echo "Java compilation completed successfully."
+          find build -name "*.class" -print

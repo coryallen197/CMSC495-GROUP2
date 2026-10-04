@@ -44,6 +44,11 @@ jobs:
             -cp "build:mysql-connector-j-9.5.0.jar" \
             Week8.TriageResultTest
 
+          java \
+            -javaagent:org.jacoco.agent-0.8.15-runtime.jar=destfile=jacoco.exec,append=true \
+            -cp "build:mysql-connector-j-9.5.0.jar" \
+            Week8.TicketTriageServiceTest
+
       - name: Generate JaCoCo coverage report
         run: |
           mkdir -p coverage

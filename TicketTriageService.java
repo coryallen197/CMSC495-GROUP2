@@ -8,6 +8,10 @@ public class TicketTriageService {
         aiService = new OpenAIService();
     }
 
+    TicketTriageService(OpenAIService aiService) {
+        this.aiService = aiService;
+    }
+
     public TriageResult analyzeTicket(
             String title,
             String description) throws Exception {
@@ -44,7 +48,7 @@ public class TicketTriageService {
         return parseResponse(response);
     }
 
-    private TriageResult parseResponse(String response) {
+    TriageResult parseResponse(String response) {
 
         String category = "";
         String priority = "";

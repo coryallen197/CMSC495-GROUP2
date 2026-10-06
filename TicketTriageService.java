@@ -8,6 +8,7 @@ public class TicketTriageService {
         aiService = new OpenAIService();
     }
 
+    // Constructor used for automated testing
     TicketTriageService(OpenAIService aiService) {
         this.aiService = aiService;
     }
@@ -48,6 +49,7 @@ public class TicketTriageService {
         return parseResponse(response);
     }
 
+    //Removed private declaration to allow testing
     TriageResult parseResponse(String response) {
 
         String category = "";

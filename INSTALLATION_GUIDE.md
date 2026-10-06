@@ -218,6 +218,7 @@ A successful connection should produce:
 
 ```text
 Testing database connection...
+Connection time: <time> ms
 Database connection successful!
 ```
 
@@ -381,7 +382,7 @@ The Ticket Dashboard serves as the primary interface for accessing the Help Desk
 The dashboard displays:
 
 ```text
-Ticket ID | Category | Priority | Status | Created Date
+Ticket ID | Title | Category | Priority | Status | Created Date
 ```
 
 Existing tickets stored in the database should appear automatically when the dashboard opens.
@@ -393,13 +394,14 @@ From the Ticket Dashboard:
 1. Select **Create New Ticket**.
 2. Enter a ticket title.
 3. Enter a description of the problem.
-4. Select a category.
-5. Select a priority.
-6. Select **Submit Ticket**.
-7. Verify that the application reports that the ticket was created successfully.
-8. Return to the Ticket Dashboard.
-9. Select **Refresh**.
-10. Verify that the new ticket appears in the dashboard.
+4. If AI access is configured, select **AI Triage**.
+5. Review the recommended category, priority, department, and AI summary.
+6. Adjust the category or priority if necessary.
+7. Select **Submit Ticket**.
+8. Verify that the application reports that the ticket was created successfully.
+9. Return to the Ticket Dashboard.
+10. Select **Refresh**.
+11. Verify that the new ticket appears in the dashboard.
 
 A newly created ticket should initially have a status of:
 
@@ -417,18 +419,26 @@ The Ticket Details interface can be used to review ticket information and perfor
 
 ### 7.6 Verify AI-Assisted Triage
 
-If `OPENAI_API_KEY` has been configured and API access is available, use the AI triage functionality from the Ticket Details interface.
+AI-assisted triage is available from the **Create Ticket** interface.
 
-Verify that the AI service returns recommendations for:
+To verify the feature:
 
-- Category
-- Priority
-- Summary
-- Department
+1. From the Ticket Dashboard, select **Create New Ticket**.
+2. Enter a ticket title and problem description.
+3. Select **AI Triage**.
+4. Wait for the AI analysis to complete.
+5. Verify that the interface displays or applies recommendations for:
+    - Category
+    - Priority
+    - Summary
+    - Department
+6. Review the recommendations before submitting the ticket.
 
-AI recommendations should be reviewed by support personnel before being used for ticket-management decisions.
+The AI recommendations are advisory. Users can review the recommended values before the ticket is submitted.
 
-If AI access has not yet been configured, the database and standard ticket-management features can still be tested independently.
+If the external AI service returns an error, the application displays an AI Triage error message rather than terminating the application.
+
+If AI access has not been configured, the database and standard ticket-management features can still be tested independently.
 
 ---
 

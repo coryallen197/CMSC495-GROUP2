@@ -14,6 +14,9 @@ public class CreateTicketForm extends JFrame {
     private JTextArea descriptionArea;
     private JComboBox<String> categoryCombo;
     private JComboBox<String> priorityCombo;
+    private JTextField departmentField;
+    private JTextArea aiSummaryArea;
+    private JButton analyzeButton;
     private JButton submitButton;
 
 
@@ -24,12 +27,10 @@ public class CreateTicketForm extends JFrame {
     public CreateTicketForm() {
 
         setTitle("Helpdesk - Create Ticket");
-        setSize(650, 500);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(700, 700);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
-
-        // Main panel
         JPanel panel = new JPanel(new GridBagLayout());
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -46,7 +47,6 @@ public class CreateTicketForm extends JFrame {
         gbc.gridy = 0;
 
         panel.add(new JLabel("Ticket Title:"), gbc);
-
 
         gbc.gridx = 1;
 
@@ -69,20 +69,17 @@ public class CreateTicketForm extends JFrame {
                 gbc
         );
 
-
         gbc.gridx = 1;
 
         descriptionArea = new JTextArea(8, 30);
 
         descriptionArea.setLineWrap(true);
-
         descriptionArea.setWrapStyleWord(true);
 
-
-        JScrollPane scrollPane =
+        JScrollPane descriptionScrollPane =
                 new JScrollPane(descriptionArea);
 
-        panel.add(scrollPane, gbc);
+        panel.add(descriptionScrollPane, gbc);
 
 
         // ==========================================
@@ -95,7 +92,6 @@ public class CreateTicketForm extends JFrame {
         gbc.anchor = GridBagConstraints.WEST;
 
         panel.add(new JLabel("Category:"), gbc);
-
 
         gbc.gridx = 1;
 
@@ -122,7 +118,6 @@ public class CreateTicketForm extends JFrame {
 
         panel.add(new JLabel("Priority:"), gbc);
 
-
         gbc.gridx = 1;
 
         String[] priorities = {
@@ -139,31 +134,288 @@ public class CreateTicketForm extends JFrame {
 
 
         // ==========================================
-        // SUBMIT BUTTON
+        // DEPARTMENT
+        // ==========================================
+
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+
+        panel.add(new JLabel("Department:"), gbc);
+
+        gbc.gridx = 1;
+
+        departmentField = new JTextField(30);
+        departmentField.setEditable(false);
+
+        panel.add(departmentField, gbc);
+
+
+        // ==========================================
+        // AI SUMMARY
+        // ==========================================
+
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+
+        panel.add(new JLabel("AI Summary:"), gbc);
+
+        gbc.gridx = 1;
+
+        aiSummaryArea = new JTextArea(4, 30);
+        aiSummaryArea.setLineWrap(true);
+        aiSummaryArea.setWrapStyleWord(true);
+        aiSummaryArea.setEditable(false);
+
+        JScrollPane summaryScrollPane =
+                new JScrollPane(aiSummaryArea);
+
+        panel.add(summaryScrollPane, gbc);
+
+
+        // ==========================================
+        // BUTTONS
         // ==========================================
 
         gbc.gridx = 1;
-        gbc.gridy = 4;
+        gbc.gridy = 6;
 
-        submitButton =
-                new JButton("Submit Ticket");
+        JPanel buttonPanel = new JPanel(new FlowLayout());
 
-        panel.add(submitButton, gbc);
+        analyzeButton = new JButton("AI Triage");
+        submitButton = new JButton("Submit Ticket");
+
+        buttonPanel.add(analyzeButton);
+        buttonPanel.add(submitButton);
+
+        panel.add(buttonPanel, gbc);
 
 
-        // IMPORTANT!
-        // Connect the button to submitTicket()
+        // ==========================================
+        // BUTTON ACTIONS
+        // ==========================================
+
+        analyzeButton.addActionListener(
+                e -> analyzeTicketWithAI()
+        );
+
         submitButton.addActionListener(
                 e -> submitTicket()
         );
 
 
-        // Add panel to window
         add(panel);
 
-
-        // Show window
         setVisible(true);
+    }
+
+
+    // ==========================================
+    // ANALYZE TICKET WITH AI
+    // ==========================================
+
+    private void analyzeTicketWithAI() {
+
+        String title =
+                titleField.getText().trim();
+
+        String description =
+                descriptionArea.getText().trim();
+
+
+        if (title.isEmpty() || description.isEmpty()) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Please enter a Ticket Title and Description before using AI Triage.",
+                    "Missing Information",
+                    JOptionPane.WARNING_MESSAGE
+            );
+
+            return;
+        }
+
+
+        analyzeButton.setEnabled(false);
+        analyzeButton.setText("Analyzing...");
+
+
+        SwingWorker<TriageResult, Void> worker =
+                new SwingWorker<>() {
+
+                    @Override
+                    protected TriageResult doInBackground()
+                            throws Exception {
+
+                        TicketTriageService triageService =
+                                new TicketTriageService();
+
+                        return triageService.analyzeTicket(
+                                title,
+                                description
+                        );
+                    }
+
+
+                    @Override
+                    protected void done() {
+
+                        try {
+
+                            TriageResult result = get();
+
+                            setCategoryFromAI(
+                                    result.getCategory()
+                            );
+
+                            setPriorityFromAI(
+                                    result.getPriority()
+                            );
+
+
+                            if (result.getDepartment() != null) {
+
+                                departmentField.setText(
+                                        result.getDepartment().trim()
+                                );
+                            }
+
+
+                            if (result.getSummary() != null) {
+
+                                aiSummaryArea.setText(
+                                        result.getSummary().trim()
+                                );
+                            }
+
+
+                            analyzeButton.setText(
+                                    "AI Triage Complete"
+                            );
+
+
+                            Timer timer = new Timer(
+                                    1500,
+                                    e -> analyzeButton.setText(
+                                            "AI Triage"
+                                    )
+                            );
+
+                            timer.setRepeats(false);
+                            timer.start();
+
+
+                        } catch (Exception e) {
+
+                            Throwable cause =
+                                    e.getCause() != null
+                                            ? e.getCause()
+                                            : e;
+
+
+                            JOptionPane.showMessageDialog(
+                                    CreateTicketForm.this,
+                                    "AI triage failed: " +
+                                            cause.getMessage(),
+                                    "AI Triage Error",
+                                    JOptionPane.ERROR_MESSAGE
+                            );
+
+
+                            cause.printStackTrace();
+
+                            analyzeButton.setText(
+                                    "AI Triage"
+                            );
+
+                        } finally {
+
+                            analyzeButton.setEnabled(true);
+                        }
+                    }
+                };
+
+
+        worker.execute();
+    }
+
+
+    // ==========================================
+    // APPLY AI CATEGORY
+    // ==========================================
+
+    private void setCategoryFromAI(String category) {
+
+        if (category == null) {
+            categoryCombo.setSelectedItem("Other");
+            return;
+        }
+
+
+        String aiCategory = category.trim();
+
+
+        for (int i = 0;
+             i < categoryCombo.getItemCount();
+             i++) {
+
+            String item =
+                    categoryCombo.getItemAt(i);
+
+            if (item.equalsIgnoreCase(aiCategory)) {
+
+                categoryCombo.setSelectedIndex(i);
+                return;
+            }
+        }
+
+
+        if (aiCategory.equalsIgnoreCase("Account")) {
+
+            categoryCombo.setSelectedItem(
+                    "Account/Login"
+            );
+
+            return;
+        }
+
+
+        categoryCombo.setSelectedItem("Other");
+    }
+
+
+    // ==========================================
+    // APPLY AI PRIORITY
+    // ==========================================
+
+    private void setPriorityFromAI(String priority) {
+
+        if (priority == null) {
+            priorityCombo.setSelectedItem("Medium");
+            return;
+        }
+
+
+        String aiPriority = priority.trim();
+
+
+        for (int i = 0;
+             i < priorityCombo.getItemCount();
+             i++) {
+
+            String item =
+                    priorityCombo.getItemAt(i);
+
+            if (item.equalsIgnoreCase(aiPriority)) {
+
+                priorityCombo.setSelectedIndex(i);
+                return;
+            }
+        }
+
+
+        priorityCombo.setSelectedItem("Medium");
     }
 
 
@@ -186,7 +438,6 @@ public class CreateTicketForm extends JFrame {
                 (String) priorityCombo.getSelectedItem();
 
 
-        // Validate fields
         if (title.isEmpty() || description.isEmpty()) {
 
             JOptionPane.showMessageDialog(
@@ -206,21 +457,20 @@ public class CreateTicketForm extends JFrame {
 
         String ticketSQL =
                 "INSERT INTO tickets " +
-                "(user_id, title, ticket_title, description, " +
-                "category, priority, status) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?)";
+                        "(user_id, title, ticket_title, description, " +
+                        "category, priority, status) " +
+                        "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
 
         String historySQL =
                 "INSERT INTO ticket_history " +
-                "(ticket_id, action, old_status, new_status, changed_by) " +
-                "VALUES (?, ?, ?, ?, ?)";
+                        "(ticket_id, action, old_status, new_status, changed_by) " +
+                        "VALUES (?, ?, ?, ?, ?)";
 
 
         try (Connection connection =
                      DatabaseConnection.getConnection()) {
 
-            // Start transaction
             connection.setAutoCommit(false);
 
 
@@ -248,7 +498,6 @@ public class CreateTicketForm extends JFrame {
                     ticketStatement.executeUpdate();
 
 
-                    // Get generated Ticket ID
                     try (ResultSet generatedKeys =
                                  ticketStatement.getGeneratedKeys()) {
 
@@ -303,14 +552,13 @@ public class CreateTicketForm extends JFrame {
                         }
 
 
-                        // Commit both database changes
                         connection.commit();
 
 
                         JOptionPane.showMessageDialog(
                                 this,
                                 "Ticket #" + ticketId +
-                                " created successfully!",
+                                        " created successfully!",
                                 "Success",
                                 JOptionPane.INFORMATION_MESSAGE
                         );
@@ -318,19 +566,17 @@ public class CreateTicketForm extends JFrame {
 
                         // Clear the form
                         titleField.setText("");
-
                         descriptionArea.setText("");
-
                         categoryCombo.setSelectedIndex(0);
-
                         priorityCombo.setSelectedIndex(0);
+                        departmentField.setText("");
+                        aiSummaryArea.setText("");
                     }
                 }
 
 
             } catch (SQLException e) {
 
-                // Roll back both inserts
                 connection.rollback();
 
                 throw e;
@@ -342,7 +588,7 @@ public class CreateTicketForm extends JFrame {
             JOptionPane.showMessageDialog(
                     this,
                     "Database Error:\n" +
-                    e.getMessage(),
+                            e.getMessage(),
                     "Database Error",
                     JOptionPane.ERROR_MESSAGE
             );

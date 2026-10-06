@@ -1,0 +1,17 @@
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# Java build output
+out/
+*.class
+
+# Local database files
+helpdesk_db/
+
+# Packaged application
+Ticket.jar
+
+# Operating system files
+.DS_Store
+Thumbs.db

@@ -34,6 +34,7 @@ The dashboard contains the following columns:
 | Column | Description |
 |---|---|
 | Ticket ID | Unique identification number assigned to the ticket |
+| Title | Title of the reported support issue |
 | Category | Type of IT problem reported |
 | Priority | Urgency assigned to the ticket |
 | Status | Current state of the ticket |
@@ -133,7 +134,24 @@ Select the appropriate priority:
 - High
 - Critical
 
-### 4.2 Submitting the Ticket
+### 4.2 Using AI Triage
+
+After entering the ticket title and description, the user may select **AI Triage** before submitting the ticket.
+
+The AI service analyzes the title and description and provides recommendations for:
+
+- Category
+- Priority
+- Summary
+- Department
+
+The recommended category and priority are applied to the corresponding fields, while the AI summary and recommended department are displayed for review.
+
+Review the AI-generated recommendations before submitting the ticket. Category and priority can be adjusted if necessary.
+
+If the AI service is unavailable, the ticket can still be completed by selecting the category and priority manually.
+
+### 4.3 Submitting the Ticket
 
 After entering the ticket information, select the button used to submit the ticket.
 
@@ -197,7 +215,7 @@ This provides support personnel with a record of how the ticket has progressed a
 
 ## 6. AI-Assisted Ticket Triage
 
-The AI-assisted triage feature helps support personnel evaluate a submitted IT support ticket.
+The AI-assisted triage feature helps evaluate an IT support request before the ticket is submitted..
 
 The feature analyzes the ticket title and description and provides a structured recommendation.
 
@@ -223,11 +241,13 @@ Department: Network Support
 
 To use AI-assisted triage:
 
-1. Open the desired ticket from the Ticket Dashboard.
-2. Review the ticket title and description.
-3. Select the available AI triage option.
+1. Open the **Create Ticket** interface.
+2. Enter the ticket title and description.
+3. Select **AI Triage**.
 4. Allow the application to analyze the ticket.
 5. Review the returned category, priority, summary, and department recommendations.
+6. Adjust the category or priority if necessary.
+7. Submit the ticket when the information has been reviewed.
 
 The AI feature requires access to the configured external AI service. If the service is unavailable or not configured, other Help Desk functions can still be used independently.
 
@@ -247,35 +267,40 @@ A typical Help Desk workflow is:
 
 ```text
 Launch Application
-        |
-        v
+       |
+       v
 View Ticket Dashboard
-        |
-        +---------------------+
-        |                     |
-        v                     v
+       |
+       +---------------------+
+       |                     |
+       v                     v
 Create New Ticket       Open Existing Ticket
-        |                     |
-        v                     v
-Submit Ticket           Review Ticket Details
-        |                     |
-        v                     +----> Review AI Triage
-Refresh Dashboard             |
-                              +----> Update Ticket Status
-                              |
-                              +----> Review Ticket History
+       |                     |
+       v                     v
+Enter Information       Review Ticket Details
+       |                     |
+       +----> AI Triage      +----> Update Ticket Status
+       |                     |
+       v                     +----> Review Ticket History
+Review Recommendations
+       |
+       v
+Submit Ticket
+       |
+       v
+Refresh Dashboard
 ```
 
 For a new support request:
 
 1. Open the Create Ticket window.
 2. Enter the ticket title and description.
-3. Select a category and priority.
-4. Submit the ticket.
-5. Refresh the Ticket Dashboard if necessary.
-6. Open the ticket to review its details.
-7. Use AI-assisted triage when appropriate.
-8. Review the AI recommendation.
+3. Use AI-assisted triage when appropriate.
+4. Review the AI recommendations.
+5. Adjust the category or priority if necessary.
+6. Submit the ticket.
+7. Refresh the Ticket Dashboard if necessary.
+8. Open the ticket to review its details.
 9. Update the ticket as the support request progresses.
 
 ## 8. Troubleshooting
@@ -346,7 +371,7 @@ Clear and complete ticket information helps both support personnel and the AI-as
 | Review details | Open the selected ticket |
 | Update status | Use the status controls in Ticket Details |
 | Review history | View the history associated with the ticket |
-| Request AI assistance | Use the AI triage option for the selected ticket |
+| Request AI assistance | Select **AI Triage** while creating a ticket |
 | Review AI results | Review category, priority, summary, and department recommendations |
 
 ---

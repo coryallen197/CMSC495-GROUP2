@@ -24,7 +24,7 @@ The primary components documented here are:
 The AI-assisted triage process separates the user interface, triage logic, external API communication, and returned data.
 
 ```text
-Ticket Details
+Create Ticket
       |
       v
 TicketTriageService
@@ -45,7 +45,7 @@ TicketTriageService
 TriageResult
       |
       v
-Ticket Details
+CreateTicket
 ```
 
 This design separates responsibilities between components:
@@ -158,11 +158,11 @@ After sending the request, `OpenAIService` obtains the HTTP response code.
 
 For successful HTTP responses, the service reads the normal response stream.
 
-For unsuccessful HTTP responses, the service reads the API error stream.
+For unsuccessful HTTP responses, the service reads the API error stream and throws an exception containing the HTTP response code and returned error information.
 
-The service then attempts to locate the generated output text in the returned response and passes that text back to `TicketTriageService`.
+For successful responses, the service locates the generated output text in the returned response and passes that text back to `TicketTriageService`.
 
-If the expected output text cannot be located, the current implementation returns the full API response to the calling service for further processing or troubleshooting.
+If the expected output text cannot be located in an otherwise successful response, the implementation returns the full API response to the calling service for further processing or troubleshooting.
 
 ## 5. TicketTriageService
 
@@ -471,6 +471,7 @@ A successful test produces:
 
 ```text
 Testing database connection...
+Connection time: <time> ms
 Database connection successful!
 ```
 
@@ -506,7 +507,9 @@ Database-related application components catch SQL exceptions where appropriate a
 
 If `OPENAI_API_KEY` is unavailable, the service throws an `IllegalStateException`.
 
-Unsuccessful HTTP responses are read from the API error stream. The returned response can then be used to identify problems with authentication, API access, service availability, or request processing.
+Unsuccessful HTTP responses are read from the API error stream. OpenAIService throws an exception 
+containing the HTTP response code and returned error information so that authentication, API access, 
+service availability, or request-processing problems can be identified by the calling component.
 
 ### 9.3 Triage Response Errors
 

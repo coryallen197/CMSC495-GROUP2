@@ -24,7 +24,7 @@ The AI IT Help Desk Assistant provides the following functionality:
 - Create and submit IT support tickets.
 - Store ticket information in a MySQL/MariaDB database.
 - View submitted tickets through a centralized Ticket Dashboard.
-- Display ticket ID, category, priority, status, and creation date.
+- Display ticket ID, title, category, priority, status, and creation date.
 - Open individual tickets to review detailed information.
 - Update ticket status.
 - Record ticket status changes in ticket history.
@@ -56,18 +56,25 @@ The application is divided into several components that work together to provide
 
 ### Create Ticket
 
-The Create Ticket interface allows users to submit a new IT support request.
+The Create Ticket interface allows users to create and submit a new IT support request.
 
-Users provide:
+Users enter:
 
 - Ticket title
 - Problem description
+
+Before submitting the ticket, users can run **AI Triage** to analyze the title and description. The AI service generates recommendations for:
+
 - Category
 - Priority
+- Summary
+- Responsible department
 
-Available categories include Hardware, Software, Network, Account/Login, and Other. Available priorities are Low, Medium, High, and Critical.
+The recommended category and priority are applied to the corresponding ticket fields, while the department and AI-generated summary are displayed for review.
 
-Before a ticket is submitted, the application verifies that a title and description have been entered. New tickets are assigned an initial status of **Open** and stored in the database. A corresponding ticket-history record is also created. 
+Users may review the recommendations before submitting the ticket. Available categories include Hardware, Software, Network, Account/Login, and Other. Available priorities are Low, Medium, High, and Critical.
+
+Before a ticket is submitted, the application verifies that a title and description have been entered. New tickets are assigned an initial status of **Open** and stored in the database. A corresponding ticket-history record is also created.
 
 ### Ticket Dashboard
 
@@ -76,6 +83,7 @@ The Ticket Dashboard provides an overview of tickets stored in the Help Desk dat
 The dashboard displays:
 
 - Ticket ID
+- Title
 - Category
 - Priority
 - Status
@@ -87,7 +95,7 @@ Tickets are displayed with the most recently created tickets first. Users can re
 
 The Ticket Details interface provides additional information about an individual support ticket.
 
-From this interface, support personnel can review ticket information, manage the ticket's status, and access the AI-assisted triage functionality.
+From this interface, support personnel can review ticket information and manage the ticket's status.
 
 ### Ticket History
 
@@ -114,56 +122,71 @@ AI recommendations are advisory. Support personnel remain responsible for review
 
 ### AI Triage Workflow
 
-Ticket Title + Description
-          |
-          v
- TicketTriageService
-          |
-          v
+    Create Ticket
+        |
+        v
+    Ticket Title + Description
+        |
+        v
+    TicketTriageService
+        |
+        v
     OpenAIService
-          |
-          v
-     OpenAI API
-          |
-          v
-     TriageResult
-          |
-          +-- Category
-          +-- Priority
-          +-- Summary
-          +-- Department
+        |
+        v
+    OpenAI API
+        |
+        v
+    TriageResult
+        |
+        +----> Category
+        +----> Priority
+        +----> Summary
+        +----> Department
+        |
+        v
+    User Reviews Recommendations
+        |
+        v
+    Submit Ticket
 
 ## System Workflow
 
 The primary application workflow connects the user interface, database, ticket-management components, and AI-assisted triage service.
 
 
-Create Ticket
-      |
-      v
-Store Ticket in Database
-      |
-      +----> Create Ticket History Record
-      |
-      v
-Ticket Dashboard
-      |
-      v
-Ticket Details
-      |
-      +----> Update Ticket Status
-      |              |
-      |              v
-      |        Record Status Change
-      |        in Ticket History
-      |
-      +----> Run AI-Assisted Triage
-                     |
-                     v
-              OpenAI API
-                     |
-                     v
-              Triage Recommendation
+    Create Ticket
+        |
+        +----> Run AI-Assisted Triage
+        |              |
+        |              v
+        |         OpenAI API
+        |              |
+        |              v
+        |       AI Recommendations
+        |              |
+        |              v
+        |         User Review
+        |
+        v
+    Submit Ticket
+        |
+        v
+    Store Ticket in Database
+        |
+        +----> Create Ticket History Record
+        |
+        v
+    Ticket Dashboard
+        |
+        v
+    Ticket Details
+        |
+        +----> Update Ticket Status
+        |
+        v
+    Record Status Change
+    in Ticket History
 
 ## Development Process
 
@@ -181,7 +204,7 @@ The project was developed incrementally through the following major steps:
 10. Added ticket status history tracking.
 11. Implemented database transaction handling for status changes.
 12. Developed the AI ticket triage service.
-13. Integrated AI triage into the Ticket Details interface.
+13. Integrated AI triage into the Create Ticket interface.
 14. Tested and debugged communication between the GUI, database, and AI components.
 15. Used Git and GitHub for source control and team collaboration.
 16. Prepared the project for automated build and testing through GitHub Actions.
@@ -214,14 +237,16 @@ The primary application workflow can be tested by:
 
 1. Starting the database server.
 2. Launching the Ticket Dashboard.
-3. Creating a new support ticket.
-4. Verifying that the ticket appears on the Ticket Dashboard.
-5. Opening the ticket to review its details.
-6. Running AI-assisted ticket triage.
-7. Reviewing the recommended category, priority, summary, and department.
-8. Changing the ticket status.
-9. Verifying that the updated status is displayed.
-10. Verifying that the status change is recorded in ticket history.
+3. Opening the Create Ticket interface.
+4. Entering a ticket title and problem description.
+5. Running AI-assisted ticket triage.
+6. Reviewing the recommended category, priority, summary, and department.
+7. Submitting the support ticket.
+8. Verifying that the ticket appears on the Ticket Dashboard.
+9. Opening the ticket to review its details.
+10. Changing the ticket status.
+11. Verifying that the updated status is displayed.
+12. Verifying that the status change is recorded in ticket history.
 
 AI-assisted testing requires a valid `OPENAI_API_KEY` with access to the configured API service.
 
@@ -240,7 +265,7 @@ Detailed environment configuration and database setup instructions are provided 
 
 ## Documentation
 
-Additional project documentation is maintained in the `docs` directory:
+Additional project documentation is maintained in the project repository:
 
 - `INSTALLATION_GUIDE.md` — Environment, database, JDBC driver, and API configuration instructions.
 - `API_DOCUMENTATION.md` — Documentation for the application's AI integration and supporting Java components.

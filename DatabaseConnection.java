@@ -23,12 +23,24 @@ public class DatabaseConnection {
         );
     }
 
-
+    //Added performance testing
     public static void main(String[] args) {
 
         System.out.println("Testing database connection...");
 
+        long startTime = System.nanoTime();
+
         try (Connection connection = getConnection()) {
+
+            long endTime = System.nanoTime();
+
+            double elapsedMilliseconds =
+                    (endTime - startTime) / 1_000_000.0;
+
+            System.out.printf(
+                    "Connection time: %.2f ms%n",
+                    elapsedMilliseconds
+            );
 
             System.out.println("Database connection successful!");
 

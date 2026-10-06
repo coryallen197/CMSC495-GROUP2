@@ -97,6 +97,13 @@ public class OpenAIService {
 
         String fullResponse = response.toString();
 
+        //Implement error handling
+        if (responseCode < 200 || responseCode >= 300) {
+            throw new Exception(
+                    "OpenAI API error (" + responseCode + "): " + fullResponse
+            );
+        }
+
         int typePosition =
                 fullResponse.indexOf("\"type\":\"output_text\"");
 

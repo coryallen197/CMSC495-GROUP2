@@ -31,7 +31,7 @@ public class TicketDashboard extends JFrame {
         // Column names
         String[] columnNames = {
                 "Ticket ID",
-                //"Title",
+                "Title",
                 "Category",
                 "Priority",
                 "Status",
@@ -115,7 +115,6 @@ public class TicketDashboard extends JFrame {
         setVisible(true);
     }
 
-
     /**
      * Loads tickets from MySQL into the JTable.
      */
@@ -146,8 +145,8 @@ public class TicketDashboard extends JFrame {
                 int ticketId =
                         resultSet.getInt("ticket_id");
 
-              //  String title =
-              //          resultSet.getString("ticket_title");
+                String title =
+                        resultSet.getString("title");
 
                 String category =
                         resultSet.getString("category");
@@ -165,7 +164,7 @@ public class TicketDashboard extends JFrame {
                 // Add ticket to table
                 tableModel.addRow(new Object[] {
                         ticketId,
-                      //  title,
+                        title,
                         category,
                         priority,
                         status,

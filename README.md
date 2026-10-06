@@ -89,7 +89,8 @@ The dashboard displays:
 - Status
 - Created Date
 
-Tickets are displayed with the most recently created tickets first. Users can refresh the dashboard, create a new ticket, or double-click an existing ticket to open its detailed view.
+Tickets are displayed with the most recently created tickets first. Users can refresh the dashboard, create a new ticket, double-click an existing ticket to open its detailed view, or select an existing ticket and run AI Triage.
+Dashboard AI Triage analyzes the selected ticket's existing title and description and displays recommended category, priority, summary, and responsible department. These recommendations are presented for review and do not automatically modify the existing ticket.
 
 ### Ticket Details
 
@@ -119,8 +120,10 @@ The ticket's title and description are submitted to the AI service for analysis.
 The application processes the AI response and stores the recommendations in a `TriageResult` object for presentation to the user. 
 
 AI recommendations are advisory. Support personnel remain responsible for reviewing the recommendation and making ticket-management decisions.
+AI Triage is available during ticket creation and from the Ticket Dashboard. During ticket creation, recommendations can be reviewed before the ticket is submitted. From the dashboard, 
+AI Triage can analyze a selected existing ticket and display recommendations without modifying the stored ticket.
 
-### AI Triage Workflow
+### Create Ticket AI Triage Workflow
 
     Create Ticket
         |
@@ -204,7 +207,7 @@ The project was developed incrementally through the following major steps:
 10. Added ticket status history tracking.
 11. Implemented database transaction handling for status changes.
 12. Developed the AI ticket triage service.
-13. Integrated AI triage into the Create Ticket interface.
+13. Integrated AI triage into the Create Ticket interface and Ticket Dashboard.
 14. Tested and debugged communication between the GUI, database, and AI components.
 15. Used Git and GitHub for source control and team collaboration.
 16. Prepared the project for automated build and testing through GitHub Actions.
@@ -247,6 +250,10 @@ The primary application workflow can be tested by:
 10. Changing the ticket status.
 11. Verifying that the updated status is displayed.
 12. Verifying that the status change is recorded in ticket history.
+
+Dashboard AI Triage can also be tested by selecting an existing ticket, clicking AI Triage,
+and reviewing the generated category, priority, summary, and department recommendations. 
+Dashboard AI analysis is advisory and does not modify the stored ticket.
 
 AI-assisted testing requires a valid `OPENAI_API_KEY` with access to the configured API service.
 

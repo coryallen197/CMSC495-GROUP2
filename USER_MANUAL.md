@@ -54,6 +54,7 @@ From the dashboard, users can:
 - Refresh the displayed ticket information.
 - Create a new ticket.
 - Open an existing ticket.
+- Run AI-assisted triage on a selected existing ticket.
 
 ### Refreshing the Dashboard
 
@@ -74,6 +75,19 @@ To view an existing ticket:
 1. Locate the desired ticket in the dashboard.
 2. Double-click the ticket row.
 3. The Ticket Details window will open for the selected ticket.
+
+### Running AI Triage from the Dashboard
+
+To analyze an existing ticket:
+
+1. Select the desired ticket in the dashboard.
+2. Select **AI Triage**.
+3. Wait for the analysis to complete.
+4. Review the recommended category, priority, summary, and department.
+
+Dashboard AI Triage is advisory. The recommendations are displayed for review and do not automatically modify the stored ticket.
+
+If no ticket is selected, the application displays a warning requesting that a ticket be selected first.
 
 ### Creating a New Ticket
 
@@ -121,8 +135,7 @@ Select the category that best represents the problem:
 - Hardware
 - Software
 - Network
-- Account
-- Login
+- Account/Login
 - Other
 
 **Priority**
@@ -190,7 +203,7 @@ Depending on the ticket, this information may include:
 - Creation information
 - Ticket history
 
-Review the ticket information before making changes to its status or acting on an AI-assisted recommendation.
+Review the ticket information before making changes to its status.
 
 ### 5.2 Updating Ticket Status
 
@@ -237,7 +250,7 @@ Summary: User cannot connect a laptop to the company wireless network.
 Department: Network Support
 ```
 
-### 6.2 Using AI Triage
+### 6.2 Using AI Triage When Creating a Ticket
 
 To use AI-assisted triage:
 
@@ -251,7 +264,18 @@ To use AI-assisted triage:
 
 The AI feature requires access to the configured external AI service. If the service is unavailable or not configured, other Help Desk functions can still be used independently.
 
-### 6.3 Reviewing AI Recommendations
+### 6.3 Using AI Triage from the Ticket Dashboard
+
+To analyze an existing ticket:
+
+1. Select the desired ticket on the Ticket Dashboard.
+2. Select **AI Triage**.
+3. Allow the application to analyze the ticket.
+4. Review the returned category, priority, summary, and department recommendations.
+
+The dashboard analysis uses the selected ticket's existing title and description. The AI recommendations are displayed for review and do not automatically change the ticket's stored category, priority, status, or other information.
+
+### 6.4 Reviewing AI Recommendations
 
 AI-generated results are recommendations and should be reviewed before they are used to make ticket-management decisions.
 
@@ -271,20 +295,20 @@ Launch Application
        v
 View Ticket Dashboard
        |
-       +---------------------+
-       |                     |
-       v                     v
-Create New Ticket       Open Existing Ticket
-       |                     |
-       v                     v
-Enter Information       Review Ticket Details
-       |                     |
-       +----> AI Triage      +----> Update Ticket Status
-       |                     |
-       v                     +----> Review Ticket History
-Review Recommendations
-       |
-       v
+       +-------------------------+
+       |                         |
+       v                         v
+Create New Ticket           Select Existing Ticket
+       |                         |
+       v                   +----+----+
+Enter Information          |         |
+       |                   v         v
+       +--> AI Triage   AI Triage  Open Ticket Details
+       |                   |            |
+       v                   v            +--> Update Ticket Status
+Review Recommendations   Review         |
+       |                Recommendations |
+       v                                +--> Review Ticket History
 Submit Ticket
        |
        v
@@ -371,7 +395,7 @@ Clear and complete ticket information helps both support personnel and the AI-as
 | Review details | Open the selected ticket |
 | Update status | Use the status controls in Ticket Details |
 | Review history | View the history associated with the ticket |
-| Request AI assistance | Select **AI Triage** while creating a ticket |
+| Request AI assistance | Select AI Triage while creating a ticket, or select an existing<br/> dashboard ticket and choose AI Triage |
 | Review AI results | Review category, priority, summary, and department recommendations |
 
 ---

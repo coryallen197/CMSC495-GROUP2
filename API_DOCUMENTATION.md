@@ -24,33 +24,39 @@ The primary components documented here are:
 The AI-assisted triage process separates the user interface, triage logic, external API communication, and returned data.
 
 ```text
-Create Ticket
-      |
-      v
-TicketTriageService
-      |
-      v
-OpenAIService
-      |
-      v
-OpenAI API
-      |
-      v
-OpenAIService
-      |
-      v
-TicketTriageService
-      |
-      v
-TriageResult
-      |
-      v
-CreateTicket
+Create Ticket                     Ticket Dashboard
+     |                                  |
+     |                                  |
+     +---------------+------------------+
+                     |
+                     v
+            TicketTriageService
+                     |
+                     v
+               OpenAIService
+                     |
+                     v
+                OpenAI API
+                     |
+                     v
+               OpenAIService
+                     |
+                     v
+            TicketTriageService
+                     |
+                     v
+               TriageResult
+                     |
+          +----------+----------+
+          |                     |
+          v                     v
+   Create Ticket         Ticket Dashboard
 ```
 
 This design separates responsibilities between components:
 
-- **Ticket Details** initiates the triage operation and presents the result.
+- **Create Ticket** can initiate AI triage before ticket submission and presents the recommendations for review.
+- **Ticket Dashboard** can initiate AI triage for a selected existing ticket and presents the recommendations without modifying the stored ticket.
 - **TicketTriageService** constructs the triage request and interprets the AI response.
 - **OpenAIService** manages communication with the external OpenAI API.
 - **TriageResult** represents the structured recommendation returned to the application.
@@ -260,6 +266,20 @@ Other
 The AI is instructed not to add additional explanations before or after the four required lines.
 
 ---
+
+### 5.5 User Interface Integration
+
+`TicketTriageService` is used by two application interfaces.
+
+**Create Ticket**
+
+The Create Ticket interface submits the entered ticket title and description for AI analysis before the ticket is submitted. The returned category and priority recommendations are applied to the corresponding fields, while the generated summary and department are displayed for review.
+
+**Ticket Dashboard**
+
+The Ticket Dashboard allows an existing ticket to be selected for AI-assisted review. The application retrieves the selected ticket's stored description and submits the ticket title and description to `TicketTriageService`.
+
+The returned category, priority, summary, and department are displayed in an AI Triage results dialog. Dashboard AI Triage is advisory and does not automatically modify the stored ticket.
 
 ## 6. AI Response Contract
 
@@ -511,6 +531,9 @@ Unsuccessful HTTP responses are read from the API error stream. OpenAIService th
 containing the HTTP response code and returned error information so that authentication, API access, 
 service availability, or request-processing problems can be identified by the calling component.
 
+Graphical interfaces that invoke AI triage provide user feedback when analysis cannot be completed. 
+The Ticket Dashboard also validates that a ticket has been selected before attempting dashboard AI triage.
+
 ### 9.3 Triage Response Errors
 
 `TicketTriageService` expects the AI-generated response to contain:
@@ -607,6 +630,9 @@ Purpose:
 Verifies that JDBC can establish a connection to `helpdesk_db`.
 
 Testing these components separately helps isolate configuration problems before testing the complete graphical application.
+
+At the graphical-interface level, AI triage can be verified through both Create Ticket and the Ticket Dashboard. Dashboard testing should verify that an existing ticket can be selected for analysis and that 
+attempting AI triage without selecting a ticket produces the expected user warning.
 
 ---
 

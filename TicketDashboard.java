@@ -90,8 +90,12 @@ public class TicketDashboard extends JFrame {
         JButton createTicketButton =
                 new JButton("Create New Ticket");
 
+        JButton aiTriageButton =
+                new JButton("AI Triage");
+
         buttonPanel.add(refreshButton);
         buttonPanel.add(createTicketButton);
+        buttonPanel.add(aiTriageButton);
 
         panel.add(buttonPanel, BorderLayout.SOUTH);
 
@@ -105,6 +109,10 @@ public class TicketDashboard extends JFrame {
 
         });
 
+        // AI Triage button
+        aiTriageButton.addActionListener(e ->
+                analyzeSelectedTicketWithAI());
+
         // Add panel
         add(panel);
 
@@ -113,6 +121,164 @@ public class TicketDashboard extends JFrame {
 
         // Display window
         setVisible(true);
+    }
+
+    /**
+     * Runs AI triage on the selected ticket.
+     */
+    private void analyzeSelectedTicketWithAI() {
+
+        int selectedRow = ticketTable.getSelectedRow();
+
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Please select a ticket from the dashboard first.",
+                    "No Ticket Selected",
+                    JOptionPane.WARNING_MESSAGE
+            );
+            return;
+        }
+
+        int ticketId =
+                (int) tableModel.getValueAt(selectedRow, 0);
+
+        String title =
+                String.valueOf(tableModel.getValueAt(selectedRow, 1));
+
+        String ticketDescription = "";
+
+        String sql =
+                "SELECT description FROM tickets WHERE ticket_id = ?";
+
+        try (Connection connection =
+                     DatabaseConnection.getConnection();
+
+             PreparedStatement statement =
+                     connection.prepareStatement(sql)) {
+
+            statement.setInt(1, ticketId);
+
+            try (ResultSet resultSet =
+                         statement.executeQuery()) {
+
+                if (resultSet.next()) {
+                    ticketDescription =
+                            resultSet.getString("description");
+                }
+            }
+
+        } catch (SQLException e) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Error loading ticket description:\n" +
+                            e.getMessage(),
+                    "Database Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+
+            e.printStackTrace();
+            return;
+        }
+
+        if (ticketDescription == null ||
+                ticketDescription.trim().isEmpty()) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "This ticket does not contain a description.",
+                    "AI Triage",
+                    JOptionPane.WARNING_MESSAGE
+            );
+
+            return;
+        }
+
+        final String description = ticketDescription;
+
+        SwingWorker<TriageResult, Void> worker =
+                new SwingWorker<>() {
+
+                    @Override
+                    protected TriageResult doInBackground()
+                            throws Exception {
+
+                        TicketTriageService service =
+                                new TicketTriageService();
+
+                        return service.analyzeTicket(
+                                title,
+                                description
+                        );
+                    }
+
+                    @Override
+                    protected void done() {
+
+                        try {
+
+                            TriageResult result = get();
+
+                            String message =
+                                    "AI TRIAGE RESULTS\n" +
+                                            "========================\n\n" +
+                                            "Ticket ID: " + ticketId + "\n" +
+                                            "Title: " + title + "\n\n" +
+                                            "Category: " +
+                                            result.getCategory() + "\n" +
+                                            "Priority: " +
+                                            result.getPriority() + "\n" +
+                                            "Summary: " +
+                                            result.getSummary() + "\n" +
+                                            "Department: " +
+                                            result.getDepartment();
+
+                            JTextArea textArea =
+                                    new JTextArea(message);
+
+                            textArea.setEditable(false);
+                            textArea.setLineWrap(true);
+                            textArea.setWrapStyleWord(true);
+                            textArea.setFont(
+                                    new Font("Arial", Font.PLAIN, 14)
+                            );
+
+                            JScrollPane scrollPane =
+                                    new JScrollPane(textArea);
+
+                            scrollPane.setPreferredSize(
+                                    new Dimension(550, 300)
+                            );
+
+                            JOptionPane.showMessageDialog(
+                                    TicketDashboard.this,
+                                    scrollPane,
+                                    "AI Triage - Ticket #" + ticketId,
+                                    JOptionPane.INFORMATION_MESSAGE
+                            );
+
+                        } catch (Exception e) {
+
+                            Throwable cause =
+                                    e.getCause() != null
+                                            ? e.getCause()
+                                            : e;
+
+                            JOptionPane.showMessageDialog(
+                                    TicketDashboard.this,
+                                    "AI triage failed:\n\n" +
+                                            cause.getMessage(),
+                                    "AI Triage Error",
+                                    JOptionPane.ERROR_MESSAGE
+                            );
+
+                            cause.printStackTrace();
+                        }
+                    }
+                };
+
+        worker.execute();
     }
 
     /**

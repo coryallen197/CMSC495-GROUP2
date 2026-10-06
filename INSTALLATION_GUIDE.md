@@ -387,6 +387,9 @@ Ticket ID | Title | Category | Priority | Status | Created Date
 
 Existing tickets stored in the database should appear automatically when the dashboard opens.
 
+The dashboard also provides Refresh, Create New Ticket, and AI Triage controls. 
+Dashboard AI Triage can be used to analyze a selected existing ticket without modifying the stored ticket.
+
 ### 7.4 Create a Test Ticket
 
 From the Ticket Dashboard:
@@ -419,7 +422,9 @@ The Ticket Details interface can be used to review ticket information and perfor
 
 ### 7.6 Verify AI-Assisted Triage
 
-AI-assisted triage is available from the **Create Ticket** interface.
+AI-assisted triage is available from the **Create Ticket** and the **Ticket Dashboard** interface.
+
+#### Create Ticket AI Triage
 
 To verify the feature:
 
@@ -434,7 +439,24 @@ To verify the feature:
     - Department
 6. Review the recommendations before submitting the ticket.
 
-The AI recommendations are advisory. Users can review the recommended values before the ticket is submitted.
+The recommended category and priority can be reviewed or adjusted before the ticket is submitted.
+
+#### Dashboard AI Triage
+
+To verify AI triage for an existing ticket:
+
+1. From the Ticket Dashboard, select an existing ticket.
+2. Select **AI Triage**.
+3. Wait for the AI analysis to complete.
+4. Verify that the AI Triage results display recommendations for:
+   - Category
+   - Priority
+   - Summary
+   - Department
+
+Dashboard AI Triage analyzes the selected ticket's existing title and description. The results are advisory and do not automatically modify the stored ticket.
+
+If no ticket is selected, the application displays a warning requesting that a ticket be selected first.
 
 If the external AI service returns an error, the application displays an AI Triage error message rather than terminating the application.
 
@@ -509,7 +531,8 @@ Before considering the installation complete, verify that:
 - Ticket details can be opened.
 - Ticket status changes can be performed and recorded.
 - `OPENAI_API_KEY` is configured when AI-assisted triage is required.
-- AI-assisted triage returns a structured recommendation when API access is available.
+- Create Ticket AI Triage returns a structured recommendation when API access is available.
+- Dashboard AI Triage can analyze a selected existing ticket and display a structured recommendation when API access is available.
 
 ## 10. Installation Complete
 
